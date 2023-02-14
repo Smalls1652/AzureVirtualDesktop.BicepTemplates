@@ -1,8 +1,25 @@
+@description('The name for the VM.')
+@minLength(1)
 param vmName string
+
+@description('The name of the hostpool the session host will be apart of.')
+@minLength(1)
 param hostPoolName string
+
+@description('The AD domain name the VM will be joining to.')
+@minLength(1)
 param vmDomainName string
+
+@description('The resource group that the managed identity, for deployment scripts, is located in.')
+@minLength(1)
 param deploymentScriptIdentityResourceGroupName string
+
+@description('The name of the managed identity for running deployment scripts.')
+@minLength(1)
 param deploymentScriptIdentityName string
+
+@description('The datacenter location the resources will reside.')
+@minLength(1)
 param location string = resourceGroup().location
 
 resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {

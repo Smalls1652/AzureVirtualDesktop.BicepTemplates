@@ -1,36 +1,83 @@
-// Define parameters
+@description('The name for the VM.')
+@minLength(1)
 param vmName string
+
+@description('The datacenter location the resources will reside.')
+@minLength(1)
 param vmLocation string = resourceGroup().location
+
+@description('The VM size to use.')
+@minLength(1)
 param vmSize string = 'Standard_D8s_v4'
-param vmDiskSizeGB int = 128
+
+@description('The size (In GB) of the OS disk for the VM.')
+param vmDiskSizeGB int = 256
+
+@description('Whether to enable \'Trusted Launch\' for the VM.')
 param vmTrustedLaunch bool = true
+
+@description('Whether to install GPU drivers for the VM.')
 param vmInstallGPUDriver bool = false
 
-param imageGalleryResourceGroup string
+@description('The resource group the image gallery is located in.')
+@minLength(1)
+param imageGalleryResourceGroupName string
+
+@description('The name of the image gallery.')
+@minLength(1)
 param imageGalleryName string
+
+@description('The name of the image to use.')
+@minLength(1)
 param imageName string
+
+@description('The version of the image to use.')
+@minLength(1)
 param imageVersion string
 
+@description('The username to use for the local admin.')
+@minLength(1)
 @secure()
 param vmAdminUserName string
+
+@description('The password to use for the local admin.')
+@minLength(1)
 @secure()
 param vmAdminPwd string
 
+@description('The resource group that the Virtual Network is located in.')
+@minLength(1)
+param vnetResourceGroupName string
+
+@description('The name of the Virtual Network.')
+@minLength(1)
 param vnetName string
-param vnetRscGroup string
+
+@description('The name of the subnet to use in the Virtual Network.')
+@minLength(1)
 param vnetSubnetName string
 
+@description('The username of the user to use to join the session host to AD.')
+@minLength(1)
 param vmJoinerUserName string
+
+@description('The password of the user joining the session host to AD.')
+@minLength(1)
 @secure()
 param vmJoinerPwd string
 
+@description('The AD domain name the VM will be joining to.')
+@minLength(1)
 param vmDomainName string
+
+@description('The OU path in AD to join the VM to.')
+@minLength(1)
 param vmDomainOUPath string
 
 // Get the image gallery.
 resource imgGallery 'Microsoft.Compute/galleries@2022-03-03' existing = {
   name: imageGalleryName
-  scope: resourceGroup(imageGalleryResourceGroup)
+  scope: resourceGroup(imageGalleryResourceGroupName)
 }
 
 resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
@@ -46,7 +93,7 @@ resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2022-
 // Get the virtual network.
 resource vnetObj 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
   name: vnetName
-  scope: resourceGroup(subscription().subscriptionId, vnetRscGroup)
+  scope: resourceGroup(subscription().subscriptionId, vnetResourceGroupName)
 }
 
 // Get the subnet in the virtual network.

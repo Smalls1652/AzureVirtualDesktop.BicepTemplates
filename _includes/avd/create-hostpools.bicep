@@ -1,14 +1,32 @@
-param location string = 'eastus2'
+@description('The datacenter location the resources will reside.')
+@minLength(1)
+param location string = resourceGroup().location
 
+@description('The resource group that the managed identity, for deployment scripts, is located in.')
+@minLength(1)
 param deploymentScriptIdentityResourceGroupName string
+
+@description('The name of the managed identity for running deployment scripts.')
+@minLength(1)
 param deploymentScriptIdentityName string
 
+@description('The name of the AVD Workspace.')
+@minLength(1)
 param workspaceName string
+
+@description('A friendly name that users will see for the AVD Workspace.')
+@minLength(1)
 param workspaceFriendlyName string
+
+@description('The base name to use when the AVD Application Groups are made.')
+@minLength(1)
 param appGroupBaseName string
 
+@description('Whether to create a \'Session Desktop\' hostpool.')
 param createDesktopHostpool bool = true
-param createRemoteAppHostpool bool = true
+
+@description('Whether to create a \'RemoteApp\' hostpool.')
+param createRemoteAppHostpool bool = false
 
 resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)

@@ -143,13 +143,13 @@ module deployHost '../_includes/sessionhost-deployments/create-sessionhost.bicep
     monitoringWorkspaceResourceGroupName: monitoringWorkspaceResourceGroupName
     monitoringWorkspaceName: monitoringWorkspaceName
 
-    imageGalleryResourceGroup: imageGalleryResourceGroupName
+    imageGalleryResourceGroupName: imageGalleryResourceGroupName
     imageGalleryName: imageGalleryName
 
     imageName: imageName
     imageVersion: imageVersion
 
-    keyVaultResourceGroup: keyVaultResourceGroupName
+    keyVaultResourceGroupName: keyVaultResourceGroupName
     keyVaultName: keyVaultName
 
     vmJoinerUserName: vmJoinerUserName
