@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "value": ""
+        },
+        "svcLocation": {
+            "value": ""
+        },
+        "deploymentScriptIdentityResourceGroupName": {
+            "value": ""
+        },
+        "deploymentScriptIdentityName": {
+            "value": ""
+        },
+        "monitoringWorkspaceSubscriptionId": {
+            "value": ""
+        },
+        "monitoringWorkspaceResourceGroupName": {
+            "value": ""
+        },
+        "monitoringWorkspaceName": {
+            "value": ""
+        },
+        "hostpoolRoleTag": {
+            "value": ""
+        },
+        "workspaceName": {
+            "value": ""
+        },
+        "workspaceFriendlyName": {
+            "value": ""
+        },
+        "createDesktopHostpool": {
+            "value": true
+        },
+        "createRemoteAppHostpool": {
+            "value": true
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "avdHostType": {
+            "value": ""
+        },
+        "resourceGroupName": {
+            "value": ""
+        },
+        "deploymentScriptIdentityResourceGroupName": {
+            "value": ""
+        },
+        "deploymentScriptIdentityName": {
+            "value": ""
+        },
+        "vmNamePrefix": {
+            "value": ""
+        },
+        "vmSize": {
+            "value": "Standard_D8s_v4"
+        },
+        "vmDiskSize": {
+            "value": 256
+        },
+        "vnetResourceGroupName": {
+            "value": ""
+        },
+        "vnetName": {
+            "value": ""
+        },
+        "vnetSubnetName": {
+            "value": ""
+        },
+        "monitoringWorkspaceSubscriptionId": {
+            "value": ""
+        },
+        "monitoringWorkspaceResourceGroupName": {
+            "value": ""
+        },
+        "monitoringWorkspaceName": {
+            "value": ""
+        },
+        "imageGalleryResourceGroupName": {
+            "value": ""
+        },
+        "imageGalleryName": {
+            "value": ""
+        },
+        "imageName": {
+            "value": ""
+        },
+        "imageVersion": {
+            "value": ""
+        },
+        "keyVaultResourceGroupName": {
+            "value": ""
+        },
+        "keyVaultName": {
+            "value": ""
+        },
+        "vmJoinerUserName": {
+            "value": ""
+        },
+        "vmJoinerKeyVaultPasswordItemName": {
+            "value": ""
+        },
+        "localAdminUserName": {
+            "value": ""
+        },
+        "localAdminKeyVaultPasswordItemName": {
+            "value": ""
+        },
+        "domainDesktopOUPath": {
+            "value": ""
+        },
+        "domainRemoteAppOUPath": {
+            "value": ""
+        },
+        "hostpoolBaseName": {
+            "value": ""
+        }
+    }
+}
