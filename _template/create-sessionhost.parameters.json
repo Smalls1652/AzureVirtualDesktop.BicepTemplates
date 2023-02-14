@@ -71,6 +71,9 @@
         "localAdminKeyVaultPasswordItemName": {
             "value": ""
         },
+        "domainName": {
+            "value": ""
+        },
         "domainDesktopOUPath": {
             "value": ""
         },
