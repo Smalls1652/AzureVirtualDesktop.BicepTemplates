@@ -4,7 +4,7 @@ param resourceGroupName string
 
 @description('The Azure region to store the resources.')
 @minLength(1)
-param svcLocation string = 'eastus2'
+param location string = 'eastus2'
 
 @description('The resource group that the managed identity, for deployment scripts, is located in.')
 @minLength(1)
@@ -50,7 +50,7 @@ var appGroupBaseName = replace(replace(workspaceName, ' ', ''), '-', '_')
 
 resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: resourceGroupName
-  location: svcLocation
+  location: location
 
   tags: {
     Workload: 'Azure Virtual Desktop'
@@ -64,7 +64,7 @@ module hostPoolResources '../_includes/avd/create-hostpools.bicep' = {
   scope: resourceGroupItem
 
   params: {
-    location: svcLocation
+    location: location
     deploymentScriptIdentityResourceGroupName: deploymentScriptIdentityResourceGroupName
     deploymentScriptIdentityName: deploymentScriptIdentityName
     workspaceName: workspaceName

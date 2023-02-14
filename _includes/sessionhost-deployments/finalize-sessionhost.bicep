@@ -3,7 +3,7 @@ param hostPoolName string
 param vmDomainName string
 param deploymentScriptIdentityResourceGroupName string
 param deploymentScriptIdentityName string
-param svcLocation string = resourceGroup().location
+param location string = resourceGroup().location
 
 resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
@@ -22,7 +22,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' existin
 
 resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzurePowerShell'
-  location: svcLocation
+  location: location
   name: 'FinalizeSessionHost-${vmName}'
 
   identity: {

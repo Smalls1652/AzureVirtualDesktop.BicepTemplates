@@ -5,7 +5,7 @@
         "resourceGroupName": {
             "value": ""
         },
-        "svcLocation": {
+        "location": {
             "value": ""
         },
         "deploymentScriptIdentityResourceGroupName": {

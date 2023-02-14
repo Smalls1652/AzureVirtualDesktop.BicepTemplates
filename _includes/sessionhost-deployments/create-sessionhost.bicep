@@ -132,7 +132,7 @@ module initFinalizeSessionHost '../../_includes/sessionhost-deployments/finalize
     deploymentScriptIdentityResourceGroupName: deploymentScriptIdentityResourceGroupName
     deploymentScriptIdentityName: deploymentScriptIdentityName
 
-    svcLocation: vmLocation
+    location: vmLocation
   }
 
   dependsOn: [
