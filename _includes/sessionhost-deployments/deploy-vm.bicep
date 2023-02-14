@@ -80,11 +80,13 @@ resource imgGallery 'Microsoft.Compute/galleries@2022-03-03' existing = {
   scope: resourceGroup(imageGalleryResourceGroupName)
 }
 
+// Get the image.
 resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
   parent: imgGallery
   name: imageName
 }
 
+// Get the specified version of the image.
 resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2022-03-03' existing = {
   parent: imgGalleryImgDef
   name: imageVersion
@@ -230,6 +232,7 @@ resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' 
   }
 }
 
+// Install the GPU driver, if specified.
 resource installGpuDriver 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = if (vmInstallGPUDriver == true) {
   name: 'gpuExtension'
   parent: windowsVm

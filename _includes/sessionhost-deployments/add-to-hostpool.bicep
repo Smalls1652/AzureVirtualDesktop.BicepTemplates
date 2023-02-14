@@ -17,21 +17,28 @@ param deploymentScriptIdentityName string
 @minLength(1)
 param location string = resourceGroup().location
 
+// Get the managed identity to use for running the deployment script.
 resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
 
+// Get the VM resource.
 resource vmItem 'Microsoft.Compute/virtualMachines@2022-11-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
+// Get the hostpool.
 resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' existing = {
   scope: resourceGroup()
   name: hostPoolName
 }
 
+// Deploy a deployment script to get the registration token info for
+// adding new session hosts to the hostpool.
+// This should be reusable for 6 hours after execution, so other deployments should use
+// the generated token.
 resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzurePowerShell'
   location: location
@@ -56,6 +63,7 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   }
 }
 
+// Execute a run command on the VM to add it to the hostpool.
 resource addVmToHostpool 'Microsoft.Compute/virtualMachines/runCommands@2022-11-01' = {
   parent: vmItem
   location: location

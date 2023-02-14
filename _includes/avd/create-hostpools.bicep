@@ -28,13 +28,16 @@ param createDesktopHostpool bool = true
 @description('Whether to create a \'RemoteApp\' hostpool.')
 param createRemoteAppHostpool bool = false
 
+// Get the managed identity that is used for running deployment scripts.
 resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
 
+// Get the subscription resource ID for the 'Hostpool Contributor' role.
 var hostpoolContributorRoleId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e307426c-f9b6-4e81-87de-d99efb3c32bc')
 
+// Create a hostpool for session desktop use, if specified.
 resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createDesktopHostpool) {
   name: '${workspaceName} - Desktop'
   location: location
@@ -47,6 +50,7 @@ resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' 
   }
 }
 
+// Assign the managaged identity the 'Hostpool Contributor' role to the created hostpool.
 resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (createDesktopHostpool) {
   scope: hostPoolDesktop
   name: guid(hostpoolContributorRoleId, 'addDesktopManagedIdentityPermission', hostPoolDesktop.id)
@@ -57,6 +61,7 @@ resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleA
   }
 }
 
+// Create an application group for the session desktop hostpool.
 resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createDesktopHostpool) {
   name: '${appGroupBaseName}_Desktop_SessionDesktop'
   location: location
@@ -67,6 +72,7 @@ resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2022
   }
 }
 
+// Create a hostpool for RemoteApp use, if specified.
 resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createRemoteAppHostpool) {
   name: '${workspaceName} - RemoteApps'
   location: location
@@ -79,6 +85,7 @@ resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2022-09-09
   }
 }
 
+// Assign the managaged identity the 'Hostpool Contributor' role to the created hostpool.
 resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (createRemoteAppHostpool) {
   scope: hostPoolRemoteApp
   name: guid(hostpoolContributorRoleId, 'addRemoteAppManagedIdentityPermission', hostPoolRemoteApp.id)
@@ -89,7 +96,7 @@ resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/rol
   }
 }
 
-
+// Create an application group for the RemoteApp hostpool.
 resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createRemoteAppHostpool) {
   name: '${appGroupBaseName}_RemoteApps_Apps'
   location: location
@@ -100,20 +107,27 @@ resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@20
   }
 }
 
+// Create a variable for storing Ids of the created application groups.
+// This is useful for defining whether a application group was created or not.
 var appGroups = [
   createDesktopHostpool ? { id: appGroupDesktop.id }: { id: null }
   createRemoteAppHostpool ? {id: appGroupRemoteApp.id } : { id: null }
 ]
 
+// Filter out any application groups that are null.
 var appGroupReferences = map(filter(appGroups, item => item.id != null), item => item.id)
 
+// Create a variable for storing Ids of the created hostpools.
+// This is useful for defining whether a hostpool was created or not.
 var hostpools = [
   createDesktopHostpool ? hostPoolDesktop : null
   createRemoteAppHostpool ? hostPoolRemoteApp : null
 ]
 
+// Filter out any hostpools that are null.
 var hostpoolsToDependOn = filter(hostpools, item => item != null)
 
+// Create the workspace and assign the created application groups to it.
 resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-09' = {
   name: workspaceName
   location: location

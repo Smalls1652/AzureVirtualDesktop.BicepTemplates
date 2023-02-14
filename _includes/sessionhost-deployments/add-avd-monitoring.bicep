@@ -24,11 +24,14 @@ resource monitoringWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-0
   name: monitoringWorkspaceName
 }
 
+// Get the VM resource.
 resource vmItem 'Microsoft.Compute/virtualMachines@2022-11-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
+// Add the monitoring agent extension to the VM.
+// NOTE: I believe I will need to update this to use the new agent.
 resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vmItem
   location: location

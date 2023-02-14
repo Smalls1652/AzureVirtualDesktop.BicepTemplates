@@ -120,7 +120,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   scope: resourceGroup(keyVaultResourceGroupName)
 }
 
-
+// Create the VM.
 module sessionHostVM '../../_includes/sessionhost-deployments/deploy-vm.bicep' = {
   name: 'deployAVDHost_${vmName}'
   params: {
@@ -154,6 +154,7 @@ module sessionHostVM '../../_includes/sessionhost-deployments/deploy-vm.bicep' =
   }
 }
 
+// Configure the VM to forward monitoring information to use with the AVD Insights workbook.
 module addMonitoring '../../_includes/sessionhost-deployments/add-avd-monitoring.bicep' = {
   name: 'deployAVDHost_${vmName}_addMonitoring'
   params: {
@@ -170,6 +171,9 @@ module addMonitoring '../../_includes/sessionhost-deployments/add-avd-monitoring
   ]
 }
 
+// Start the 'Invoke-SessionHostFinalize' deployment script.
+// It will wait until the VM is registered to the hostpool, then set it drain mode, and
+// restart the VM.
 module initFinalizeSessionHost '../../_includes/sessionhost-deployments/finalize-sessionhost.bicep' = {
   name: 'deployAVD_${vmName}_finalizeSessionHost'
   params: {
@@ -189,6 +193,7 @@ module initFinalizeSessionHost '../../_includes/sessionhost-deployments/finalize
   ]
 }
 
+// Start the deployment script(s) for adding the VM to the hostpool.
 module addToHostPool '../../_includes/sessionhost-deployments/add-to-hostpool.bicep' = {
   name: 'deployAVD_${vmName}_addToHostPool'
   params: {

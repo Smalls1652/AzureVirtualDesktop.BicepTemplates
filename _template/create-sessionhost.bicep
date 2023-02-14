@@ -114,12 +114,15 @@ param hostPoolBaseName string
 
 targetScope = 'subscription'
 
+// Generate a 6 character random string.
 var randomString = take(uniqueString(subscription().id, randomHash), 6)
 
+// Get the resource group.
 resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: resourceGroupName
 }
 
+// Deploy the session host.
 module deployHost '../_includes/sessionhost-deployments/create-sessionhost.bicep' = {
   name: 'deploySessionHost_${randomString}'
   scope: resourceGroupItem
