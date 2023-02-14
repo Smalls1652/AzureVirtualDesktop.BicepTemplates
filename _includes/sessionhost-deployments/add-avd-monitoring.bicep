@@ -6,17 +6,17 @@ param monitoringWorkspaceResourceGroupName string
 param monitoringWorkspaceName string
 
 // Get the AVD monitoring Log Analytics workspace.
-resource monitoringWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+resource monitoringWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   scope: resourceGroup(monitoringWorkspaceSubscriptionId, monitoringWorkspaceResourceGroupName)
   name: monitoringWorkspaceName
 }
 
-resource vmItem 'Microsoft.Compute/virtualMachines@2021-07-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2022-11-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
-resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vmItem
   location: location
   name: 'Microsoft.EnterpriseCloud.Monitoring'

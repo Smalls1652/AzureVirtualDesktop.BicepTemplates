@@ -116,7 +116,7 @@ targetScope = 'subscription'
 
 var randomString = take(uniqueString(subscription().id, randomHash), 6)
 
-resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: resourceGroupName
 }
 

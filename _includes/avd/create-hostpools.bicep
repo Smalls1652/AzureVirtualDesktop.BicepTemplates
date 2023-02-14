@@ -10,14 +10,14 @@ param appGroupBaseName string
 param createDesktopHostpool bool = true
 param createRemoteAppHostpool bool = true
 
-resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' existing = {
+resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
 
 var hostpoolContributorRoleId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e307426c-f9b6-4e81-87de-d99efb3c32bc')
 
-resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2021-07-12' = if (createDesktopHostpool) {
+resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createDesktopHostpool) {
   name: '${workspaceName} - Desktop'
   location: location
 
@@ -29,7 +29,7 @@ resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2021-07-12' 
   }
 }
 
-resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (createDesktopHostpool) {
+resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (createDesktopHostpool) {
   scope: hostPoolDesktop
   name: guid(hostpoolContributorRoleId, 'addDesktopManagedIdentityPermission', hostPoolDesktop.id)
 
@@ -39,7 +39,7 @@ resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleA
   }
 }
 
-resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2021-07-12' = if (createDesktopHostpool) {
+resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createDesktopHostpool) {
   name: '${appGroupBaseName}_Desktop_SessionDesktop'
   location: location
 
@@ -49,7 +49,7 @@ resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2021
   }
 }
 
-resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2021-07-12' = if (createRemoteAppHostpool) {
+resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createRemoteAppHostpool) {
   name: '${workspaceName} - RemoteApps'
   location: location
 
@@ -61,7 +61,7 @@ resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2021-07-12
   }
 }
 
-resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (createRemoteAppHostpool) {
+resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (createRemoteAppHostpool) {
   scope: hostPoolRemoteApp
   name: guid(hostpoolContributorRoleId, 'addRemoteAppManagedIdentityPermission', hostPoolRemoteApp.id)
 
@@ -72,7 +72,7 @@ resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/rol
 }
 
 
-resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2021-07-12' = if (createRemoteAppHostpool) {
+resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createRemoteAppHostpool) {
   name: '${appGroupBaseName}_RemoteApps_Apps'
   location: location
 
@@ -96,7 +96,7 @@ var hostpools = [
 
 var hostpoolsToDependOn = filter(hostpools, item => item != null)
 
-resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' = {
+resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-09' = {
   name: workspaceName
   location: location
 

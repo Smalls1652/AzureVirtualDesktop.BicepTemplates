@@ -5,17 +5,17 @@ param deploymentScriptIdentityResourceGroupName string
 param deploymentScriptIdentityName string
 param svcLocation string = resourceGroup().location
 
-resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' existing = {
+resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
 
-resource vmItem 'Microsoft.Compute/virtualMachines@2021-07-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2022-11-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2021-07-12' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' existing = {
   scope: resourceGroup()
   name: hostPoolName
 }

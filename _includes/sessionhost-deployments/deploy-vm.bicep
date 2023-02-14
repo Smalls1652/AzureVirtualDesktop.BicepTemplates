@@ -28,36 +28,36 @@ param vmDomainName string
 param vmDomainOUPath string
 
 // Get the image gallery.
-resource imgGallery 'Microsoft.Compute/galleries@2021-07-01' existing = {
+resource imgGallery 'Microsoft.Compute/galleries@2022-03-03' existing = {
   name: imageGalleryName
   scope: resourceGroup(imageGalleryResourceGroup)
 }
 
-resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2021-07-01' existing = {
+resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
   parent: imgGallery
   name: imageName
 }
 
-resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2021-07-01' existing = {
+resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2022-03-03' existing = {
   parent: imgGalleryImgDef
   name: imageVersion
 }
 
 // Get the virtual network.
-resource vnetObj 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
+resource vnetObj 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
   name: vnetName
   scope: resourceGroup(subscription().subscriptionId, vnetRscGroup)
 }
 
 // Get the subnet in the virtual network.
-resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' existing = {
+resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
   parent: vnetObj
   name: vnetSubnetName
 }
 
 // Create the NIC for the VM.
 // Set the NIC to utilize the subnet from the virtual network.
-resource vmNic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+resource vmNic 'Microsoft.Network/networkInterfaces@2022-07-01' = {
   name: '${vmName}_nic'
   location: vmLocation
 
@@ -87,7 +87,7 @@ resource vmNic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 }
 
 // Deploy the Windows VM.
-resource windowsVm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+resource windowsVm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: vmName
   location: vmLocation
   properties: {
@@ -155,7 +155,7 @@ resource windowsVm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
 }
 
 // Join to the domain.
-resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   name: 'joinDomain'
   location: vmLocation
 
@@ -183,7 +183,7 @@ resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' 
   }
 }
 
-resource installGpuDriver 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = if (vmInstallGPUDriver == true) {
+resource installGpuDriver 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = if (vmInstallGPUDriver == true) {
   name: 'gpuExtension'
   parent: windowsVm
   location: vmLocation

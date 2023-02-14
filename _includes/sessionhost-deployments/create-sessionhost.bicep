@@ -67,7 +67,7 @@ var randomStrLength = int(14 - length(vmNamePrefix))
 var vmName = '${vmNamePrefix}-${take(uniqueString(subscription().id, resourceGroup().id, randomHashString), randomStrLength)}'
 
 // Get the Key Vault resource for reading the default admin credentials.
-resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
   scope: resourceGroup(keyVaultResourceGroup)
 }
