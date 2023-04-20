@@ -1,25 +1,19 @@
 @description('The datacenter location the resources will reside.')
-@minLength(1)
 param location string = resourceGroup().location
 
 @description('The resource group that the managed identity, for deployment scripts, is located in.')
-@minLength(1)
 param deploymentScriptIdentityResourceGroupName string
 
 @description('The name of the managed identity for running deployment scripts.')
-@minLength(1)
 param deploymentScriptIdentityName string
 
 @description('The name of the AVD Workspace.')
-@minLength(1)
 param workspaceName string
 
 @description('A friendly name that users will see for the AVD Workspace.')
-@minLength(1)
 param workspaceFriendlyName string
 
 @description('The base name to use when the AVD Application Groups are made.')
-@minLength(1)
 param appGroupBaseName string
 
 @description('Whether to create a \'Session Desktop\' hostpool.')
@@ -119,13 +113,15 @@ var appGroupReferences = map(filter(appGroups, item => item.id != null), item =>
 
 // Create a variable for storing Ids of the created hostpools.
 // This is useful for defining whether a hostpool was created or not.
+/* 
 var hostpools = [
   createDesktopHostpool ? hostPoolDesktop : null
   createRemoteAppHostpool ? hostPoolRemoteApp : null
 ]
+*/
 
 // Filter out any hostpools that are null.
-var hostpoolsToDependOn = filter(hostpools, item => item != null)
+//var hostpoolsToDependOn = filter(hostpools, item => !empty(item))
 
 // Create the workspace and assign the created application groups to it.
 resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-09' = {
@@ -137,7 +133,10 @@ resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-0
     applicationGroupReferences: appGroupReferences
   }
 
-  dependsOn: hostpoolsToDependOn
+  dependsOn: [
+    hostPoolDesktop
+    hostPoolRemoteApp
+  ]
 }
 
 output workspaceId string = workspaceResource.id

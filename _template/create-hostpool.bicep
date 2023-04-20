@@ -1,41 +1,31 @@
 @description('The name of the resource group to use.')
-@minLength(1)
 param resourceGroupName string
 
 @description('The Azure region to store the resources.')
-@minLength(1)
 param location string = 'eastus2'
 
 @description('The resource group that the managed identity, for deployment scripts, is located in.')
-@minLength(1)
 param deploymentScriptIdentityResourceGroupName string
 
 @description('The name of the managed identity for running deployment scripts.')
-@minLength(1)
 param deploymentScriptIdentityName string
 
 @description('The subscription ID that the log analytics workspace in located in.')
-@minLength(1)
 param monitoringWorkspaceSubscriptionId string = subscription().subscriptionId
 
 @description('The resource group that the log analytics workspace is located in.')
-@minLength(1)
 param monitoringWorkspaceResourceGroupName string
 
 @description('The name of the log analytics workspace.')
-@minLength(1)
 param monitoringWorkspaceName string
 
 @description('The name of the role the hostpool is for.')
-@minLength(1)
 param hostpoolRoleTag string
 
 @description('The name of the AVD Workspace.')
-@minLength(1)
 param workspaceName string
 
 @description('A friendly name that users will see for the AVD Workspace.')
-@minLength(1)
 param workspaceFriendlyName string
 
 @description('Whether to create a \'Session Desktop\' hostpool.')

@@ -1,5 +1,4 @@
 @description('The name for the storage account.')
-@minLength(1)
 param storageAccountName string
 
 @description('The datacenter location to use.')

@@ -2,19 +2,15 @@
 param vmName string
 
 @description('The name of the AVD hostpool to add the VM to.')
-@minLength(1)
 param hostPoolName string
 
 @description('The resource group that the managed identity, for deployment scripts, is located in.')
-@minLength(1)
 param deploymentScriptIdentityResourceGroupName string
 
 @description('The name of the managed identity for running deployment scripts.')
-@minLength(1)
 param deploymentScriptIdentityName string
 
 @description('The Azure region.')
-@minLength(1)
 param location string = resourceGroup().location
 
 // Get the managed identity to use for running the deployment script.

@@ -1,13 +1,10 @@
 @description('The name for the VM.')
-@minLength(1)
 param vmName string
 
 @description('The datacenter location the resources will reside.')
-@minLength(1)
 param vmLocation string = resourceGroup().location
 
 @description('The VM size to use.')
-@minLength(1)
 param vmSize string = 'Standard_D8s_v4'
 
 @description('The size (In GB) of the OS disk for the VM.')
@@ -20,58 +17,45 @@ param vmTrustedLaunch bool = true
 param vmInstallGPUDriver bool = false
 
 @description('The resource group the image gallery is located in.')
-@minLength(1)
 param imageGalleryResourceGroupName string
 
 @description('The name of the image gallery.')
-@minLength(1)
 param imageGalleryName string
 
 @description('The name of the image to use.')
-@minLength(1)
 param imageName string
 
 @description('The version of the image to use.')
-@minLength(1)
 param imageVersion string
 
 @description('The username to use for the local admin.')
-@minLength(1)
 @secure()
 param vmAdminUserName string
 
 @description('The password to use for the local admin.')
-@minLength(1)
 @secure()
 param vmAdminPwd string
 
 @description('The resource group that the Virtual Network is located in.')
-@minLength(1)
 param vnetResourceGroupName string
 
 @description('The name of the Virtual Network.')
-@minLength(1)
 param vnetName string
 
 @description('The name of the subnet to use in the Virtual Network.')
-@minLength(1)
 param vnetSubnetName string
 
 @description('The username of the user to use to join the session host to AD.')
-@minLength(1)
 param vmJoinerUserName string
 
 @description('The password of the user joining the session host to AD.')
-@minLength(1)
 @secure()
 param vmJoinerPwd string
 
 @description('The AD domain name the VM will be joining to.')
-@minLength(1)
 param vmDomainName string
 
 @description('The OU path in AD to join the VM to.')
-@minLength(1)
 param vmDomainOUPath string
 
 // Get the image gallery.
