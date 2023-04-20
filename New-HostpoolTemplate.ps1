@@ -6,7 +6,14 @@ param(
 )
 
 $templatePath = Join-Path -Path $PSScriptRoot -ChildPath "_template/"
-$outPath = Join-Path -Path $PSScriptRoot -ChildPath "$($HostPoolName)/"
+$filesToCopy = Get-ChildItem -Path $templatePath
+$hostpoolsDirPath = Join-Path -Path $PSScriptRoot -ChildPath "hostpools/"
+$outPath = Join-Path -Path $hostpoolsDirPath -ChildPath "$($HostPoolName)/"
+
+if (!(Test-Path -Path $hostpoolsDirPath)) {
+    Write-Warning "'$($hostpoolsDirPath)' does not already exist. Creating..."
+    $null = New-Item -Path $hostpoolsDirPath -ItemType "Directory"
+}
 
 if (Test-Path -Path $outPath) {
     $PSCmdlet.ThrowTerminatingError(
@@ -19,4 +26,12 @@ if (Test-Path -Path $outPath) {
     )
 }
 
-Copy-Item -Path $templatePath -Destination $outPath -Recurse
+Write-Verbose "Output folder will be: $($outPath)"
+$outDirectory = New-Item -Path $outPath -ItemType "Directory"
+foreach ($fileItem in $filesToCopy) {
+    $outFilePath = Join-Path -Path $outPath -ChildPath $fileItem.Name
+    Write-Verbose "Copying '$($fileItem.Name)' to '$($outFilePath)'."
+    Copy-Item -Path $fileItem.FullName -Destination $outFilePath
+}
+
+$outDirectory
