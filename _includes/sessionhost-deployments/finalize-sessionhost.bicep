@@ -51,7 +51,7 @@ resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2020-10-01' 
     azPowerShellVersion: '7.5'
 
     scriptContent: loadTextContent('./_scripts/Invoke-SessionHostFinalize.ps1')
-    arguments: '-VmResourceId \\"${vmItem.id}\\" -HostPoolName \\"${hostPool.name}\\" -DomainName \\"${vmDomainName}\\"'
+    arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -VmResourceId \\"${vmItem.id}\\" -HostPoolName \\"${hostPool.name}\\" -DomainName \\"${vmDomainName}\\"'
 
     timeout: 'PT2H'
     cleanupPreference: 'OnSuccess'

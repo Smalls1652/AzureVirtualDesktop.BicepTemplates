@@ -1,10 +1,14 @@
 [CmdletBinding()]
 param(
-    [Parameter(Position = 0, Mandatory = $true)]
-    [string]$VmResourceId,
-    [Parameter(Position = 1, Mandatory = $true)]
-    [string]$HostPoolName,
+    [Parameter(Position = 0, Mandatory)]
+    [string]$TenantId,
+    [Parameter(Position = 1, Mandatory)]
+    [string]$SubscriptionId,
     [Parameter(Position = 2, Mandatory = $true)]
+    [string]$VmResourceId,
+    [Parameter(Position = 3, Mandatory = $true)]
+    [string]$HostPoolName,
+    [Parameter(Position = 4, Mandatory = $true)]
     [string]$DomainName
 )
 
@@ -12,7 +16,7 @@ $writeInfoSplat = @{
     "InformationAction" = "Continue";
 }
 
-Connect-AzAccount -Identity -Tenant "16cc8ad9-84fe-481d-b9b0-48e7758c41aa" -Subscription "f01b1a05-dca3-4a19-9132-f1d18d758182"
+Connect-AzAccount -Identity -Tenant $TenantId -Subscription $SubscriptionId
 
 $vmObj = Get-AzResource -ResourceId $VmResourceId | Get-AzVM
 

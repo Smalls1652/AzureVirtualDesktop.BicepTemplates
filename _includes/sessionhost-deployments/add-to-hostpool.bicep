@@ -51,7 +51,7 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     azPowerShellVersion: '7.5'
     
     scriptContent: loadTextContent('./_scripts/Get-HostPoolRegInfo.ps1')
-    arguments: '-ResourceGroupName \\"${resourceGroup().name}\\" -HostPoolName \\"${hostPool.name}\\"'
+    arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -ResourceGroupName \\"${resourceGroup().name}\\" -HostPoolName \\"${hostPool.name}\\"'
 
     timeout: 'PT30M'
     cleanupPreference: 'OnSuccess'
