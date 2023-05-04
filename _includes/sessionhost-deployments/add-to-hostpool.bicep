@@ -48,7 +48,7 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   }
 
   properties: {
-    azPowerShellVersion: '7.5'
+    azPowerShellVersion: '9.6'
     
     scriptContent: loadTextContent('./_scripts/Get-HostPoolRegInfo.ps1')
     arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -ResourceGroupName \\"${resourceGroup().name}\\" -HostPoolName \\"${hostPool.name}\\"'
