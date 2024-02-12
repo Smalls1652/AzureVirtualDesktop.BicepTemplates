@@ -32,13 +32,13 @@
         "vnetSubnetName": {
             "value": ""
         },
-        "monitoringWorkspaceSubscriptionId": {
+        "dcrSubscriptionId": {
             "value": ""
         },
-        "monitoringWorkspaceResourceGroupName": {
+        "dcrResourceGroupName": {
             "value": ""
         },
-        "monitoringWorkspaceName": {
+        "dcrName": {
             "value": ""
         },
         "imageGalleryResourceGroupName": {

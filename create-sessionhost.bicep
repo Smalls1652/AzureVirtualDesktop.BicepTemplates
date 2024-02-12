@@ -34,14 +34,14 @@ param vnetName string
 @description('The name of the subnet to use in the Virtual Network.')
 param vnetSubnetName string
 
-@description('The subscription ID that the log analytics workspace in located in.')
-param monitoringWorkspaceSubscriptionId string = subscription().subscriptionId
+@description('The subscription ID that the DCR is located in.')
+param dcrSubscriptionId string = subscription().subscriptionId
 
-@description('The resource group that the log analytics workspace is located in.')
-param monitoringWorkspaceResourceGroupName string
+@description('The resource group that the DCR is located in.')
+param dcrResourceGroupName string
 
-@description('The name of the log analytics workspace.')
-param monitoringWorkspaceName string
+@description('The name of the DCR.')
+param dcrName string
 
 @description('The resource group the image gallery is located in.')
 param imageGalleryResourceGroupName string
@@ -93,7 +93,7 @@ targetScope = 'subscription'
 var randomString = take(uniqueString(subscription().id, randomHash), 6)
 
 // Get the resource group.
-resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
+resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2023-07-01' existing = {
   name: resourceGroupName
 }
 
@@ -117,9 +117,9 @@ module deployHost './_includes/sessionhost-deployments/create-sessionhost.bicep'
     vnetName: vnetName
     vnetSubnetName: vnetSubnetName
 
-    monitoringWorkspaceSubscriptionId: monitoringWorkspaceSubscriptionId
-    monitoringWorkspaceResourceGroupName: monitoringWorkspaceResourceGroupName
-    monitoringWorkspaceName: monitoringWorkspaceName
+    dcrSubscriptionId: dcrSubscriptionId
+    dcrResourceGroupName: dcrResourceGroupName
+    dcrName: dcrName
 
     imageGalleryResourceGroupName: imageGalleryResourceGroupName
     imageGalleryName: imageGalleryName

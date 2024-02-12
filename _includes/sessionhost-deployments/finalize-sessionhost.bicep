@@ -23,19 +23,19 @@ resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdenti
 }
 
 // Get the VM resource.
-resource vmItem 'Microsoft.Compute/virtualMachines@2022-11-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2023-09-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
 // Get the hostpool.
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = {
   scope: resourceGroup()
   name: hostPoolName
 }
 
 // Start the 'Invoke-SessionHostFinalize' deployment script.
-resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   kind: 'AzurePowerShell'
   location: location
   name: 'FinalizeSessionHost-${vmName}'

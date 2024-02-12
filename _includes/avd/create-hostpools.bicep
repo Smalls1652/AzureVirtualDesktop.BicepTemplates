@@ -22,8 +22,15 @@ param createDesktopHostpool bool = true
 @description('Whether to create a \'RemoteApp\' hostpool.')
 param createRemoteAppHostpool bool = false
 
+@description('The type of hostpool to use')
+@allowed([
+  'Pooled'
+  'Personal'
+])
+param hostpoolType string = 'Pooled'
+
 // Get the managed identity that is used for running deployment scripts.
-resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
@@ -32,12 +39,12 @@ resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdenti
 var hostpoolContributorRoleId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e307426c-f9b6-4e81-87de-d99efb3c32bc')
 
 // Create a hostpool for session desktop use, if specified.
-resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createDesktopHostpool) {
+resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = if (createDesktopHostpool) {
   name: '${workspaceName} - Desktop'
   location: location
 
   properties: {
-    hostPoolType: 'Pooled'
+    hostPoolType: hostpoolType
     loadBalancerType: 'DepthFirst'
     maxSessionLimit: 5
     preferredAppGroupType: 'Desktop'
@@ -56,7 +63,7 @@ resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleA
 }
 
 // Create an application group for the session desktop hostpool.
-resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createDesktopHostpool) {
+resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05' = if (createDesktopHostpool) {
   name: '${appGroupBaseName}_Desktop_SessionDesktop'
   location: location
 
@@ -67,12 +74,12 @@ resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2022
 }
 
 // Create a hostpool for RemoteApp use, if specified.
-resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' = if (createRemoteAppHostpool) {
+resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = if (createRemoteAppHostpool) {
   name: '${workspaceName} - RemoteApps'
   location: location
 
   properties: {
-    hostPoolType: 'Pooled'
+    hostPoolType: hostpoolType
     loadBalancerType: 'DepthFirst'
     maxSessionLimit: 5
     preferredAppGroupType: 'RailApplications'
@@ -91,7 +98,7 @@ resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/rol
 }
 
 // Create an application group for the RemoteApp hostpool.
-resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2022-09-09' = if (createRemoteAppHostpool) {
+resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05' = if (createRemoteAppHostpool) {
   name: '${appGroupBaseName}_RemoteApps_Apps'
   location: location
 
@@ -124,7 +131,7 @@ var hostpools = [
 //var hostpoolsToDependOn = filter(hostpools, item => !empty(item))
 
 // Create the workspace and assign the created application groups to it.
-resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-09' = {
+resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2023-09-05' = {
   name: workspaceName
   location: location
 

@@ -34,6 +34,13 @@ param createDesktopHostpool bool = true
 @description('Whether to create a \'RemoteApp\' hostpool.')
 param createRemoteAppHostpool bool = false
 
+@description('The type of hostpool to use')
+@allowed([
+  'Pooled'
+  'Personal'
+])
+param hostpoolType string = 'Pooled'
+
 targetScope = 'subscription'
 
 // Generate the base name for the Application Groups.
@@ -41,7 +48,7 @@ targetScope = 'subscription'
 var appGroupBaseName = replace(replace(workspaceName, ' ', ''), '-', '_')
 
 // Create the resource group.
-resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: resourceGroupName
   location: location
 
@@ -66,6 +73,7 @@ module hostPoolResources './_includes/avd/create-hostpools.bicep' = {
     appGroupBaseName: appGroupBaseName
     createDesktopHostpool: createDesktopHostpool
     createRemoteAppHostpool: createRemoteAppHostpool
+    hostpoolType: hostpoolType
   }
 }
 

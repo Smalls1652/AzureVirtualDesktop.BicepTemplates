@@ -14,13 +14,13 @@ param monitoringWorkspaceName string
 var settingName = 'WVDInsights'
 
 // Get the Log Analytics workspace.
-resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   scope: resourceGroup(monitoringWorkspaceSubscriptionId, monitoringWorkspaceResourceGroupName)
   name: monitoringWorkspaceName
 }
 
 // Get the AVD hostpool.
-resource hostpoolResource 'Microsoft.DesktopVirtualization/hostPools@2022-09-09' existing = {
+resource hostpoolResource 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = {
   scope: resourceGroup()
   name: hostpoolName
 }
@@ -33,27 +33,7 @@ resource addHostpoolMonitoring 'Microsoft.Insights/diagnosticSettings@2021-05-01
     workspaceId: monitoringWorkspaceResource.id
     logs: [
       {
-        category: 'Checkpoint'
-        enabled: true
-      }
-      {
-        category: 'Error'
-        enabled: true
-      }
-      {
-        category: 'Management'
-        enabled: true
-      }
-      {
-        category: 'Connection'
-        enabled: true
-      }
-      {
-        category: 'HostRegistration'
-        enabled: true
-      }
-      {
-        category: 'AgentHealthStatus'
+        categoryGroup: 'allLogs'
         enabled: true
       }
     ]

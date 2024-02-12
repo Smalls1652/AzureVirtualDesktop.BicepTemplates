@@ -13,13 +13,13 @@ param monitoringWorkspaceName string
 var settingName = 'WVDInsights'
 
 // Get the log analytics workspace.
-resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   scope: resourceGroup(monitoringWorkspaceSubscriptionId, monitoringWorkspaceResourceGroupName)
   name: monitoringWorkspaceName
 }
 
 // Get the AVD workspace.
-resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2022-09-09' existing = {
+resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2023-09-05' existing = {
   scope: resourceGroup()
   name: workspaceName
 }

@@ -35,14 +35,14 @@ param vnetName string
 @description('The name of the subnet to use in the Virtual Network.')
 param vnetSubnetName string
 
-@description('The subscription ID that the log analytics workspace in located in.')
-param monitoringWorkspaceSubscriptionId string = subscription().subscriptionId
+@description('The subscription ID that the DCR is located in.')
+param dcrSubscriptionId string = subscription().subscriptionId
 
-@description('The resource group that the log analytics workspace is located in.')
-param monitoringWorkspaceResourceGroupName string
+@description('The resource group that the DCR is located in.')
+param dcrResourceGroupName string
 
-@description('The name of the log analytics workspace.')
-param monitoringWorkspaceName string
+@description('The name of the DCR.')
+param dcrName string
 
 @description('The resource group the image gallery is located in.')
 param imageGalleryResourceGroupName string
@@ -90,7 +90,7 @@ var randomStrLength = int(14 - length(vmNamePrefix))
 var vmName = '${vmNamePrefix}-${take(uniqueString(subscription().id, resourceGroup().id, randomHashString), randomStrLength)}'
 
 // Get the Key Vault resource for reading the default admin credentials.
-resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
   scope: resourceGroup(keyVaultResourceGroupName)
 }
@@ -136,9 +136,9 @@ module addMonitoring '../../_includes/sessionhost-deployments/add-avd-monitoring
     vmName: vmName
     location: vmLocation
 
-    monitoringWorkspaceSubscriptionId: monitoringWorkspaceSubscriptionId
-    monitoringWorkspaceResourceGroupName: monitoringWorkspaceResourceGroupName
-    monitoringWorkspaceName: monitoringWorkspaceName
+    dcrSubscriptionId: dcrSubscriptionId
+    dcrResourceGroupName: dcrResourceGroupName
+    dcrName: dcrName
   }
   
   dependsOn: [
