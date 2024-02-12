@@ -6,9 +6,11 @@ param(
 )
 
 $templatePath = Join-Path -Path $PSScriptRoot -ChildPath "_template/"
-$filesToCopy = Get-ChildItem -Path $templatePath
+$filesToCopy = Get-ChildItem -Path $templatePath | Where-Object { $PSItem.Extension -eq ".bicepparam" }
 $hostpoolsDirPath = Join-Path -Path $PSScriptRoot -ChildPath "hostpools/"
 $outPath = Join-Path -Path $hostpoolsDirPath -ChildPath "$($HostPoolName)/"
+
+$bicepParamUsingRegex = [regex]::new("using '(?'usingPath'.+?)'")
 
 if (!(Test-Path -Path $hostpoolsDirPath)) {
     Write-Warning "'$($hostpoolsDirPath)' does not already exist. Creating..."
@@ -30,8 +32,15 @@ Write-Verbose "Output folder will be: $($outPath)"
 $outDirectory = New-Item -Path $outPath -ItemType "Directory"
 foreach ($fileItem in $filesToCopy) {
     $outFilePath = Join-Path -Path $outPath -ChildPath $fileItem.Name
+
+    $bicepFile = Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "$($fileItem.BaseName).bicep")
+
+    $templateFileContent = Get-Content -Path $fileItem.FullName -Raw
+
+    $updatedTemplateFileContent = $bicepParamUsingRegex.Replace($templateFileContent, "using '$([System.IO.Path]::GetRelativePath($outPath, $bicepFile.FullName))'")
+
     Write-Verbose "Copying '$($fileItem.Name)' to '$($outFilePath)'."
-    Copy-Item -Path $fileItem.FullName -Destination $outFilePath
+    Out-File -InputObject $updatedTemplateFileContent -FilePath $outFilePath -Force -Encoding "UTF8"
 }
 
 $outDirectory
