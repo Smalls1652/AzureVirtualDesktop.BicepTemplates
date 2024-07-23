@@ -82,6 +82,13 @@ param domainName string
 @description('The OU path in AD to join the VM to.')
 param domainOUPath string
 
+@description('The type of directory to join the VM to.')
+@allowed([
+  'ActiveDirectory'
+  'EntraID'
+])
+param vmJoinType string = 'ActiveDirectory'
+
 @description('The name of the hostpool the session host will be apart of.')
 param hostPoolName string
 
@@ -124,8 +131,10 @@ module sessionHostVM '../../_includes/sessionhost-deployments/deploy-vm.bicep' =
     vnetResourceGroupName: vnetResourceGroupName
     vnetSubnetName: vnetSubnetName
 
-    vmJoinerUserName: vmJoinerUserName
-    vmJoinerPwd: keyVault.getSecret(vmJoinerKeyVaultPasswordItemName)
+    vmJoinType: vmJoinType
+
+    vmJoinerUserName: vmJoinType == 'ActiveDirectory' ? vmJoinerUserName : ''
+    vmJoinerPwd: vmJoinType == 'ActiveDirectory' ? keyVault.getSecret(vmJoinerKeyVaultPasswordItemName) : ''
   }
 }
 
@@ -140,7 +149,7 @@ module addMonitoring '../../_includes/sessionhost-deployments/add-avd-monitoring
     dcrResourceGroupName: dcrResourceGroupName
     dcrName: dcrName
   }
-  
+
   dependsOn: [
     sessionHostVM
   ]
@@ -178,6 +187,8 @@ module addToHostPool '../../_includes/sessionhost-deployments/add-to-hostpool.bi
 
     deploymentScriptIdentityResourceGroupName: deploymentScriptIdentityResourceGroupName
     deploymentScriptIdentityName: deploymentScriptIdentityName
+
+    joinToEntraId: vmJoinType == 'EntraID'
   }
 
   dependsOn: [

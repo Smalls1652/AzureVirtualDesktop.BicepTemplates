@@ -38,6 +38,8 @@ param keyVaultResourceGroupName = ''
 
 param keyVaultName = ''
 
+param vmJoinType = 'ActiveDirectory'
+
 param vmJoinerUserName = ''
 
 param vmJoinerKeyVaultPasswordItemName = ''
@@ -52,4 +54,4 @@ param domainDesktopOUPath = ''
 
 param domainRemoteAppOUPath = ''
 
-param hostpoolBaseName = ''
+param hostPoolBaseName = ''

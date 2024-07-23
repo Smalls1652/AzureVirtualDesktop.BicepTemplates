@@ -20,7 +20,7 @@ resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2
 }
 
 // Get the AVD hostpool.
-resource hostpoolResource 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = {
+resource hostpoolResource 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' existing = {
   scope: resourceGroup()
   name: hostpoolName
 }

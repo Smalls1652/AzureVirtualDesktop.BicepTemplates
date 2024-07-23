@@ -13,24 +13,24 @@ param dcrResourceGroupName string
 @description('The name of the DCR.')
 param dcrName string
 
-resource dcrResource 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = {
+resource dcrResource 'Microsoft.Insights/dataCollectionRules@2023-03-11' existing = {
   name: dcrName
   scope: resourceGroup(dcrSubscriptionId, dcrResourceGroupName)
 }
 
 // Get the VM resource.
-resource vmItem 'Microsoft.Compute/virtualMachines@2023-09-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2024-03-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
 // Add the monitoring agent extension to the VM.
 // NOTE: I believe I will need to update this to use the new agent.
-resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@2024-03-01' = {
   parent: vmItem
   location: location
   name: 'AzureMonitorWindowsAgent'
-  
+
   properties: {
     publisher: 'Microsoft.Azure.Monitor'
     type: 'AzureMonitorWindowsAgent'
@@ -45,7 +45,7 @@ resource addMonitoringExtension 'Microsoft.Compute/virtualMachines/extensions@20
   }
 }
 
-resource vmDataCollectionRuleAssociation 'Microsoft.Insights/dataCollectionRuleAssociations@2022-06-01' = {
+resource vmDataCollectionRuleAssociation 'Microsoft.Insights/dataCollectionRuleAssociations@2023-03-11' = {
   name: 'avd-monitoring'
   scope: vmItem
 

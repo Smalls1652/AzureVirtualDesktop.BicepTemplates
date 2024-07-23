@@ -19,7 +19,7 @@ resource monitoringWorkspaceResource 'Microsoft.OperationalInsights/workspaces@2
 }
 
 // Get the AVD workspace.
-resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2023-09-05' existing = {
+resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2024-04-03' existing = {
   scope: resourceGroup()
   name: workspaceName
 }

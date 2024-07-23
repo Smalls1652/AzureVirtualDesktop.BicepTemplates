@@ -17,19 +17,19 @@ param deploymentScriptIdentityName string
 param location string = resourceGroup().location
 
 // Get the managed identity to use for running the deployment script.
-resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   scope: resourceGroup(deploymentScriptIdentityResourceGroupName)
   name: deploymentScriptIdentityName
 }
 
 // Get the VM resource.
-resource vmItem 'Microsoft.Compute/virtualMachines@2023-09-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2024-03-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
 // Get the hostpool.
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' existing = {
   scope: resourceGroup()
   name: hostPoolName
 }
@@ -48,7 +48,7 @@ resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2023-08-01' 
   }
 
   properties: {
-    azPowerShellVersion: '9.6'
+    azPowerShellVersion: '12.0'
 
     scriptContent: loadTextContent('./_scripts/Invoke-SessionHostFinalize.ps1')
     arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -VmResourceId \\"${vmItem.id}\\" -HostPoolName \\"${hostPool.name}\\" -DomainName \\"${vmDomainName}\\"'

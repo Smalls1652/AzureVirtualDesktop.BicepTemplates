@@ -8,7 +8,7 @@ param(
     [string]$VmResourceId,
     [Parameter(Position = 3, Mandatory = $true)]
     [string]$HostPoolName,
-    [Parameter(Position = 4, Mandatory = $true)]
+    [Parameter(Position = 4)]
     [string]$DomainName
 )
 
@@ -20,10 +20,19 @@ Connect-AzAccount -Identity -Tenant $TenantId -Subscription $SubscriptionId
 
 $vmObj = Get-AzResource -ResourceId $VmResourceId | Get-AzVM
 
+$vmName = $null
+
+if ($null -eq $DomainName -or [string]::IsNullOrWhiteSpace($DomainName)) {
+  $vmName = $vmObj.Name
+}
+else {
+  $vmName = "$($vmObj.Name).$($DomainName)"
+}
+
 $sessionHostFound = $false
 while ($sessionHostFound -eq $false) {
     try {
-        Get-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name "$($vmObj.Name).$($DomainName)" -ErrorAction "Stop"
+        Get-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name $vmName -ErrorAction "Stop"
         $sessionHostFound = $true
     }
     catch {
@@ -33,7 +42,7 @@ while ($sessionHostFound -eq $false) {
 }
 
 Write-Information @writeInfoSplat -MessageData "Setting session host to drain mode."
-$null = Update-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name "$($vmObj.Name).$($DomainName)" -AllowNewSession:$false
+$null = Update-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name $vmName -AllowNewSession:$false
 
 Write-Information @writeInfoSplat -MessageData "Waiting for session host to switch to drain mode."
 Start-Sleep -Seconds 30
@@ -41,7 +50,7 @@ $sessionHostStatusIsAvailable = $false
 $sessionHostStatusIsValid = $true
 $sessionHostUnavailableCounter = 0
 while ($sessionHostStatusIsAvailable -eq $false) {
-    $sessionHostStatus = Get-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name "$($vmObj.Name).$($DomainName)"
+    $sessionHostStatus = Get-AzWvdSessionHost -ResourceGroupName $vmObj.ResourceGroupName -HostPoolName $HostPoolName -Name $vmName
 
     switch ($sessionHostStatus.Status) {
         "Available" {

@@ -10,6 +10,9 @@ param deploymentScriptIdentityResourceGroupName string
 @description('The name of the managed identity for running deployment scripts.')
 param deploymentScriptIdentityName string
 
+@description('Whether to join the VM to Entra ID.')
+param joinToEntraId bool = false
+
 @description('The Azure region.')
 param location string = resourceGroup().location
 
@@ -20,13 +23,13 @@ resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdenti
 }
 
 // Get the VM resource.
-resource vmItem 'Microsoft.Compute/virtualMachines@2023-09-01' existing = {
+resource vmItem 'Microsoft.Compute/virtualMachines@2024-03-01' existing = {
   scope: resourceGroup()
   name: vmName
 }
 
 // Get the hostpool.
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' existing = {
   scope: resourceGroup()
   name: hostPoolName
 }
@@ -48,8 +51,8 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   }
 
   properties: {
-    azPowerShellVersion: '9.6'
-    
+    azPowerShellVersion: '12.0'
+
     scriptContent: loadTextContent('./_scripts/Get-HostPoolRegInfo.ps1')
     arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -ResourceGroupName \\"${resourceGroup().name}\\" -HostPoolName \\"${hostPool.name}\\"'
 
@@ -60,7 +63,7 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
 }
 
 // Execute a run command on the VM to add it to the hostpool.
-resource addVmToHostpool 'Microsoft.Compute/virtualMachines/runCommands@2023-09-01' = {
+resource addVmToHostpool 'Microsoft.Compute/virtualMachines/runCommands@2024-03-01' = {
   parent: vmItem
   location: location
   name: 'AddVmToHostpool'
@@ -78,10 +81,36 @@ resource addVmToHostpool 'Microsoft.Compute/virtualMachines/runCommands@2023-09-
         name: 'RegistrationToken'
         value: hostPoolRegInfo.properties.outputs.regToken
       }
+      {
+        name: 'EnrollToEntraId'
+        value: joinToEntraId ? 'Yes' : 'No'
+      }
+      {
+        name: 'EnrollToIntune'
+        value: joinToEntraId ? 'Yes' : 'No'
+      }
     ]
   }
 
   tags: {
     VirtualMachine: vmName
+  }
+}
+
+resource addEntraIDLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2024-03-01' = if (joinToEntraId == true) {
+  name: 'AADLoginForWindows'
+  parent: vmItem
+
+  location: location
+
+  properties: {
+    publisher: 'Microsoft.Azure.ActiveDirectory'
+    type: 'AADLoginForWindows'
+    typeHandlerVersion: '2.0'
+    autoUpgradeMinorVersion: true
+
+    settings: {
+      mdmId: '0000000a-0000-0000-c000-000000000000'
+    }
   }
 }

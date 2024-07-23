@@ -1,7 +1,19 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [Parameter(Position = 0, Mandatory)]
-    [string]$RegistrationToken
+    [string]$RegistrationToken,
+    [Parameter(Position = 1)]
+    [ValidateSet(
+      "Yes",
+      "No"
+    )]
+    [string]$EnrollToEntraId = "No",
+    [Parameter(Position = 2)]
+    [ValidateSet(
+      "Yes",
+      "No"
+    )]
+    [string]$EnrollToIntune = "No"
 )
 
 <#
@@ -23,13 +35,10 @@ param(
         #>
 
 # Install the 'PSDesiredStateConfiguration' module.
-pwsh.exe -Command { Install-Module -Name "PSDesiredStateConfiguration" -MaximumVersion "2.99" -Scope "AllUsers" -Force -Verbose }
+pwsh.exe -Command { Install-PSResource -Name "PSDesiredStateConfiguration" -Scope "AllUsers" -Version "[2.0.0, 2.99.0]" -TrustRepository }
 
 # Install the 'xPSDesiredStateConfiguration' module in the global modules directory for PowerShell 7.
-pwsh.exe -Command { Install-Module -Name "xPSDesiredStateConfiguration" -Scope "AllUsers" -Force -Verbose }
-
-# Enable the ability for PowerShell 7 to utilize the 'Invoke-DscResource' cmdlet.
-pwsh.exe -Command { Enable-ExperimentalFeature -Name "PSDesiredStateConfiguration.InvokeDscResource" -Scope "AllUsers" }
+pwsh.exe -Command { Install-PSResource -Name "xPSDesiredStateConfiguration" -Scope "AllUsers" -Version "9.1.0" -TrustRepository }
 
 # This script block is the actual script to run.
 $agentInstallScriptBlock = {
@@ -79,13 +88,13 @@ $agentInstallScriptBlock = {
         <#
         .SYNOPSIS
         Download a file from the internet.
-        
+
         .DESCRIPTION
         A simple file downloader that downloads a file to a directory without manually specifying the file's ouput name.
-        
+
         .PARAMETER Uri
         The URI of the resource to download.
-        
+
         .PARAMETER OutDir
         The output directory for the file to be downloaded to.
         #>
@@ -147,10 +156,10 @@ $agentInstallScriptBlock = {
         <#
         .SYNOPSIS
         Get the MSI product code of a MSI installer.
-        
+
         .DESCRIPTION
         Get the MSI product code of a MSI installer without utilizing Orca or any other manual retrieval method.
-        
+
         .PARAMETER FilePath
         The path to the MSI installer.
         #>
@@ -281,3 +290,137 @@ $updatedAgentInstallScriptBlock = [System.Management.Automation.ScriptBlock]::Cr
 
 # Run the script block with PowerShell 7.
 pwsh.exe -NoProfile -Command $updatedAgentInstallScriptBlock
+
+$setAadJoinScriptBlock = {
+  [CmdletBinding()]
+  param()
+
+  enum RegKeyPropertyType {
+    String
+    ExpandString
+    Binary
+    DWord
+    MultiString
+    QWord
+    Unknown
+  }
+
+  class RegKeyProperty {
+    [string]$KeyPath
+    [string]$PropertyName
+    [RegKeyPropertyType]$PropertyType
+    [string]$PropertyValue
+
+    RegKeyProperty() {}
+
+    RegKeyProperty([string]$path, [string]$propName, [RegKeyPropertyType]$propType, [string]$value) {
+      $this.KeyPath = $path
+      $this.PropertyName = $propName
+      $this.PropertyType = $propType
+      $this.PropertyValue = $value
+    }
+  }
+
+  $writeInfoSplat = @{
+    "InformationAction" = "Continue";
+  }
+
+  $keyPropsToSet = @(
+    [RegKeyProperty]::new("HKLM:\SOFTWARE\Microsoft\RDInfraAgent\AzureADJoin", "JoinAzureAD", [RegKeyPropertyType]::DWord, 1)
+  )
+
+  foreach ($keyProp in $keyPropsToSet) {
+    $regKeyPropDscProps = @{
+      "Ensure"    = "Present";
+      "Force"     = $true;
+      "Key"       = $keyProp.KeyPath;
+      "ValueName" = $keyProp.PropertyName;
+      "ValueType" = $keyProp.PropertyType.ToString();
+      "ValueData" = $keyProp.PropertyValue;
+    }
+
+    $regDscSplat = @{
+      "Module"   = "xPSDesiredStateConfiguration";
+      "Name"     = "xRegistry";
+      "Property" = $regKeyPropDscProps;
+    }
+
+    $regKeyPropDscTest = Invoke-DscResource @regDscSplat -Method "Test"
+
+    if ($regKeyPropDscTest.InDesiredState -eq $false) {
+      Write-Information @writeInfoSplat -MessageData  "Setting '$($keyProp.KeyPath)' property '$($keyProp.PropertyName)' to $($keyProp.PropertyValue)'."
+      $null = Invoke-DscResource @regDscSplat -Method "Set"
+    }
+  }
+}
+
+$setIntuneEnrollmentScriptBlock = {
+  [CmdletBinding()]
+  param()
+
+  enum RegKeyPropertyType {
+    String
+    ExpandString
+    Binary
+    DWord
+    MultiString
+    QWord
+    Unknown
+  }
+
+  class RegKeyProperty {
+    [string]$KeyPath
+    [string]$PropertyName
+    [RegKeyPropertyType]$PropertyType
+    [string]$PropertyValue
+
+    RegKeyProperty() {}
+
+    RegKeyProperty([string]$path, [string]$propName, [RegKeyPropertyType]$propType, [string]$value) {
+      $this.KeyPath = $path
+      $this.PropertyName = $propName
+      $this.PropertyType = $propType
+      $this.PropertyValue = $value
+    }
+  }
+
+  $writeInfoSplat = @{
+    "InformationAction" = "Continue";
+  }
+
+  $keyPropsToSet = @(
+    [RegKeyProperty]::new("HKLM:\SOFTWARE\Microsoft\RDInfraAgent\AzureADJoin", "MDMEnrollmentId", [RegKeyPropertyType]::String, "0000000a-0000-0000-c000-000000000000")
+  )
+
+  foreach ($keyProp in $keyPropsToSet) {
+    $regKeyPropDscProps = @{
+      "Ensure"    = "Present";
+      "Force"     = $true;
+      "Key"       = $keyProp.KeyPath;
+      "ValueName" = $keyProp.PropertyName;
+      "ValueType" = $keyProp.PropertyType.ToString();
+      "ValueData" = $keyProp.PropertyValue;
+    }
+
+    $regDscSplat = @{
+      "Module"   = "xPSDesiredStateConfiguration";
+      "Name"     = "xRegistry";
+      "Property" = $regKeyPropDscProps;
+    }
+
+    $regKeyPropDscTest = Invoke-DscResource @regDscSplat -Method "Test"
+
+    if ($regKeyPropDscTest.InDesiredState -eq $false) {
+      Write-Information @writeInfoSplat -MessageData  "Setting '$($keyProp.KeyPath)' property '$($keyProp.PropertyName)' to $($keyProp.PropertyValue)'."
+      $null = Invoke-DscResource @regDscSplat -Method "Set"
+    }
+  }
+}
+
+if ($EnrollToEntraId -eq "Yes") {
+  pwsh.exe -NoProfile -Command $setAadJoinScriptBlock
+}
+
+if ($EnrollToIntune -eq "Yes") {
+  pwsh.exe -NoProfile -Command $setIntuneEnrollmentScriptBlock
+}

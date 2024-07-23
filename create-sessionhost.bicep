@@ -61,6 +61,13 @@ param keyVaultResourceGroupName string
 @description('The name of the key vault.')
 param keyVaultName string
 
+@description('The type of directory to join the VM to.')
+@allowed([
+  'ActiveDirectory'
+  'EntraID'
+])
+param vmJoinType string = 'ActiveDirectory'
+
 @description('The username of the user to use to join the session host to AD.')
 param vmJoinerUserName string
 
@@ -93,7 +100,7 @@ targetScope = 'subscription'
 var randomString = take(uniqueString(subscription().id, randomHash), 6)
 
 // Get the resource group.
-resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2023-07-01' existing = {
+resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2024-03-01' existing = {
   name: resourceGroupName
 }
 
@@ -130,15 +137,22 @@ module deployHost './_includes/sessionhost-deployments/create-sessionhost.bicep'
     keyVaultResourceGroupName: keyVaultResourceGroupName
     keyVaultName: keyVaultName
 
-    vmJoinerUserName: vmJoinerUserName
-    vmJoinerKeyVaultPasswordItemName: vmJoinerKeyVaultPasswordItemName
+    vmJoinType: vmJoinType
+
+    vmJoinerUserName: vmJoinType == 'ActiveDirectory' ? vmJoinerUserName : ''
+    vmJoinerKeyVaultPasswordItemName: vmJoinType == 'ActiveDirectory' ? vmJoinerKeyVaultPasswordItemName : ''
 
     localAdminUserName: localAdminUserName
     localAdminKeyVaultPasswordItemName: localAdminKeyVaultPasswordItemName
 
-    domainName: domainName
-    domainOUPath: avdHostType == 'Desktop' ? domainDesktopOUPath : domainRemoteAppOUPath
+    domainName: vmJoinType == 'ActiveDirectory' ? domainName : ''
+    domainOUPath: vmJoinType == 'ActiveDirectory'
+      ? avdHostType == 'Desktop'
+        ? domainDesktopOUPath
+        : domainRemoteAppOUPath
+      : ''
 
-    hostPoolName: avdHostType == 'Desktop' ? '${hostPoolBaseName} - Desktop' : '${hostPoolBaseName} - RemoteApps'
+
+    hostPoolName: avdHostType == 'Desktop' ? '${hostPoolBaseName}_Desktop' : '${hostPoolBaseName}_RemoteApps'
   }
 }

@@ -45,6 +45,13 @@ param vnetName string
 @description('The name of the subnet to use in the Virtual Network.')
 param vnetSubnetName string
 
+@description('The type of directory to join the VM to.')
+@allowed([
+  'ActiveDirectory'
+  'EntraID'
+])
+param vmJoinType string = 'ActiveDirectory'
+
 @description('The username of the user to use to join the session host to AD.')
 param vmJoinerUserName string
 
@@ -59,38 +66,38 @@ param vmDomainName string
 param vmDomainOUPath string
 
 // Get the image gallery.
-resource imgGallery 'Microsoft.Compute/galleries@2022-08-03' existing = {
+resource imgGallery 'Microsoft.Compute/galleries@2023-07-03' existing = {
   name: imageGalleryName
   scope: resourceGroup(imageGalleryResourceGroupName)
 }
 
 // Get the image.
-resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2022-08-03' existing = {
+resource imgGalleryImgDef 'Microsoft.Compute/galleries/images@2023-07-03' existing = {
   parent: imgGallery
   name: imageName
 }
 
 // Get the specified version of the image.
-resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2022-08-03' existing = {
+resource imgGalleryImgVersion 'Microsoft.Compute/galleries/images/versions@2023-07-03' existing = {
   parent: imgGalleryImgDef
   name: imageVersion
 }
 
 // Get the virtual network.
-resource vnetObj 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
+resource vnetObj 'Microsoft.Network/virtualNetworks@2024-01-01' existing = {
   name: vnetName
   scope: resourceGroup(subscription().subscriptionId, vnetResourceGroupName)
 }
 
 // Get the subnet in the virtual network.
-resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-01-01' existing = {
   parent: vnetObj
   name: vnetSubnetName
 }
 
 // Create the NIC for the VM.
 // Set the NIC to utilize the subnet from the virtual network.
-resource vmNic 'Microsoft.Network/networkInterfaces@2023-09-01' = {
+resource vmNic 'Microsoft.Network/networkInterfaces@2024-01-01' = {
   name: '${vmName}_nic'
   location: vmLocation
 
@@ -120,9 +127,14 @@ resource vmNic 'Microsoft.Network/networkInterfaces@2023-09-01' = {
 }
 
 // Deploy the Windows VM.
-resource windowsVm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
+resource windowsVm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
   name: vmName
   location: vmLocation
+
+  identity: {
+    type: 'SystemAssigned'
+  }
+
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -137,13 +149,15 @@ resource windowsVm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       }
     }
 
-    securityProfile: vmTrustedLaunch == true ? {
-      securityType: 'TrustedLaunch'
-      uefiSettings: {
-        secureBootEnabled: true
-        vTpmEnabled: true
-      }
-    } : null
+    securityProfile: vmTrustedLaunch == true
+      ? {
+          securityType: 'TrustedLaunch'
+          uefiSettings: {
+            secureBootEnabled: true
+            vTpmEnabled: true
+          }
+        }
+      : null
 
     licenseType: 'Windows_Client'
 
@@ -187,7 +201,7 @@ resource windowsVm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
 }
 
 // Join to the domain.
-resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2024-03-01' = if (vmJoinType == 'ActiveDirectory') {
   name: 'joinDomain'
   location: vmLocation
 
@@ -216,7 +230,7 @@ resource joinToDomain 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' 
 }
 
 // Install the GPU driver, if specified.
-resource installGpuDriver 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (vmInstallGPUDriver == true) {
+resource installGpuDriver 'Microsoft.Compute/virtualMachines/extensions@2024-03-01' = if (vmInstallGPUDriver == true) {
   name: 'gpuExtension'
   parent: windowsVm
   location: vmLocation

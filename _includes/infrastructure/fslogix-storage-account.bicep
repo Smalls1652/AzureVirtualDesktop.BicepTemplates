@@ -5,7 +5,7 @@ param storageAccountName string
 param location string = resourceGroup().location
 
 // Create the storage account
-resource fslogixStgAcct 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+resource fslogixStgAcct 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
   kind: 'StorageV2'
@@ -48,7 +48,7 @@ resource fslogixStgAcct 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 
 // Configure the settings for file shares in the storage account.
 // This primarily sets the SMB protocol to not accept RC4 Kerberos encryption.
-resource fslogixStgAcctFileSvcs 'Microsoft.Storage/storageAccounts/fileServices@2023-01-01' = {
+resource fslogixStgAcctFileSvcs 'Microsoft.Storage/storageAccounts/fileServices@2023-05-01' = {
   parent: fslogixStgAcct
   name: 'default'
 
@@ -70,7 +70,7 @@ resource fslogixStgAcctFileSvcs 'Microsoft.Storage/storageAccounts/fileServices@
 }
 
 // Create a file share named 'profiles'.
-resource fslogixStgAcctProfilesShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+resource fslogixStgAcctProfilesShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
   parent: fslogixStgAcctFileSvcs
   name: 'profiles'
 

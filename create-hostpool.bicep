@@ -22,7 +22,11 @@ param monitoringWorkspaceName string
 @description('The name of the role the hostpool is for.')
 param hostpoolRoleTag string
 
+@description('The environment for the AVD workspace.')
+param workspaceEnvironment string = 'Production'
+
 @description('The name of the AVD Workspace.')
+@minLength(3)
 param workspaceName string
 
 @description('A friendly name that users will see for the AVD Workspace.')
@@ -48,7 +52,7 @@ targetScope = 'subscription'
 var appGroupBaseName = replace(replace(workspaceName, ' ', ''), '-', '_')
 
 // Create the resource group.
-resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: resourceGroupName
   location: location
 
@@ -68,9 +72,9 @@ module hostPoolResources './_includes/avd/create-hostpools.bicep' = {
     location: location
     deploymentScriptIdentityResourceGroupName: deploymentScriptIdentityResourceGroupName
     deploymentScriptIdentityName: deploymentScriptIdentityName
+    workspaceEnvironment: workspaceEnvironment
     workspaceName: workspaceName
     workspaceFriendlyName: workspaceFriendlyName
-    appGroupBaseName: appGroupBaseName
     createDesktopHostpool: createDesktopHostpool
     createRemoteAppHostpool: createRemoteAppHostpool
     hostpoolType: hostpoolType

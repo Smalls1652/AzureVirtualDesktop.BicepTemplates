@@ -7,14 +7,18 @@ param deploymentScriptIdentityResourceGroupName string
 @description('The name of the managed identity for running deployment scripts.')
 param deploymentScriptIdentityName string
 
+@description('The environment for the AVD workspace.')
+param workspaceEnvironment string = 'Production'
+
 @description('The name of the AVD Workspace.')
+@minLength(3)
 param workspaceName string
 
 @description('A friendly name that users will see for the AVD Workspace.')
 param workspaceFriendlyName string
 
-@description('The base name to use when the AVD Application Groups are made.')
-param appGroupBaseName string
+//@description('The base name to use when the AVD Application Groups are made.')
+//param appGroupBaseName string
 
 @description('Whether to create a \'Session Desktop\' hostpool.')
 param createDesktopHostpool bool = true
@@ -39,8 +43,8 @@ resource deploymentScriptPrincipal 'Microsoft.ManagedIdentity/userAssignedIdenti
 var hostpoolContributorRoleId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e307426c-f9b6-4e81-87de-d99efb3c32bc')
 
 // Create a hostpool for session desktop use, if specified.
-resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = if (createDesktopHostpool) {
-  name: '${workspaceName} - Desktop'
+resource hostPoolDesktop 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' = if (createDesktopHostpool) {
+  name: '${workspaceEnvironment}_${workspaceName}_Desktop'
   location: location
 
   properties: {
@@ -63,8 +67,8 @@ resource hostPoolDesktopManagedIdentityPermission 'Microsoft.Authorization/roleA
 }
 
 // Create an application group for the session desktop hostpool.
-resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05' = if (createDesktopHostpool) {
-  name: '${appGroupBaseName}_Desktop_SessionDesktop'
+resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2024-04-03' = if (createDesktopHostpool) {
+  name: '${workspaceEnvironment}_${workspaceName}_Desktop_SessionDesktop'
   location: location
 
   properties: {
@@ -74,8 +78,8 @@ resource appGroupDesktop 'Microsoft.DesktopVirtualization/applicationGroups@2023
 }
 
 // Create a hostpool for RemoteApp use, if specified.
-resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = if (createRemoteAppHostpool) {
-  name: '${workspaceName} - RemoteApps'
+resource hostPoolRemoteApp 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' = if (createRemoteAppHostpool) {
+  name: '${workspaceEnvironment}_${workspaceName}_RemoteApps'
   location: location
 
   properties: {
@@ -98,8 +102,8 @@ resource hostPoolRemoteAppManagedIdentityPermission 'Microsoft.Authorization/rol
 }
 
 // Create an application group for the RemoteApp hostpool.
-resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05' = if (createRemoteAppHostpool) {
-  name: '${appGroupBaseName}_RemoteApps_Apps'
+resource appGroupRemoteApp 'Microsoft.DesktopVirtualization/applicationGroups@2024-04-03' = if (createRemoteAppHostpool) {
+  name: '${workspaceEnvironment}_${workspaceName}_RemoteApps_Apps'
   location: location
 
   properties: {
@@ -120,7 +124,7 @@ var appGroupReferences = map(filter(appGroups, item => item.id != null), item =>
 
 // Create a variable for storing Ids of the created hostpools.
 // This is useful for defining whether a hostpool was created or not.
-/* 
+/*
 var hostpools = [
   createDesktopHostpool ? hostPoolDesktop : null
   createRemoteAppHostpool ? hostPoolRemoteApp : null
@@ -131,8 +135,8 @@ var hostpools = [
 //var hostpoolsToDependOn = filter(hostpools, item => !empty(item))
 
 // Create the workspace and assign the created application groups to it.
-resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2023-09-05' = {
-  name: workspaceName
+resource workspaceResource 'Microsoft.DesktopVirtualization/workspaces@2024-04-03' = {
+  name: '${workspaceEnvironment}_${workspaceName}'
   location: location
 
   properties: {

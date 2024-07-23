@@ -16,6 +16,8 @@ param monitoringWorkspaceName = ''
 
 param hostpoolRoleTag = ''
 
+param workspaceEnvironment = ''
+
 param workspaceName = ''
 
 param workspaceFriendlyName = ''

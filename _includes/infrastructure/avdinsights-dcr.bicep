@@ -6,12 +6,12 @@ param monitoringWorkspaceName string
 
 var dcrName = 'microsoft-avdi-${location}'
 
-resource monitoringWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+resource monitoringWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: monitoringWorkspaceName
   scope: resourceGroup(monitoringWorkspaceSubscriptionId, monitoringWorkspaceResourceGroupName)
 }
 
-resource dataCollectionRulesResource 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
+resource dataCollectionRulesResource 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
   name: dcrName
   location: location
   kind: 'Windows'
