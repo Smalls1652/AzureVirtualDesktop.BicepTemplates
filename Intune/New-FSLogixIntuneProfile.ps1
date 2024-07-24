@@ -406,9 +406,9 @@ catch [System.Exception] {
 $createdProfile = $null
 if ($PSCmdlet.ShouldProcess($ProfileName, "Create Intune config profile")) {
 	$createdProfile = New-MgBetaDeviceManagementConfigurationPolicy -BodyParameter $newFslogixProfile -ErrorAction "Stop"
+
+	Write-Output -InputObject $createdProfile
 }
 else {
-	$createdProfile = $newFslogixProfile
+	Write-Output -InputObject $newFslogixProfile
 }
-
-Write-Output -InputObject $createdProfile
