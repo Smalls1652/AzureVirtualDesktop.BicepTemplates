@@ -5,7 +5,7 @@ param(
     [string]$HostPoolName,
 		[Parameter(Position = 1)]
 		[ValidateNotNullOrWhiteSpace()]
-		[string]$RootPath
+		[string]$RootPath = (Get-Location).Path
 )
 
 $templatePath = Join-Path -Path $RootPath -ChildPath ".template-files/"

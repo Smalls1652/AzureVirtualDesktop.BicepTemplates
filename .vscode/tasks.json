@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Create hostpool template",
+      "detail": "Create a new hostpool template directory.",
+      "icon": {
+        "id": "file-directory-create",
+        "color": "terminal.ansiBlue"
+      },
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/scripts/New-HostpoolTemplate.ps1",
+        "-HostPoolName",
+        "${input:hostpoolName}",
+        "-RootPath",
+        "${workspaceFolder}"
+      ],
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "hostpoolName",
+      "description": "Enter the name of the hostpool.",
+      "type": "promptString"
+    }
+  ]
+}
