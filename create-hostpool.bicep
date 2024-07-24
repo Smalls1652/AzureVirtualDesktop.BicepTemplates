@@ -64,7 +64,7 @@ resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2024-03-01' = {
 }
 
 // Create the hostpools, application groups, and workspace.
-module hostPoolResources './_includes/avd/create-hostpools.bicep' = {
+module hostPoolResources './.includes/avd/create-hostpools.bicep' = {
   name: 'createHostPoolResources'
   scope: resourceGroupItem
 
@@ -82,7 +82,7 @@ module hostPoolResources './_includes/avd/create-hostpools.bicep' = {
 }
 
 // Configure the diagnostic settings for the AVD insights workbook on the created workspace.
-module workspaceAddMonitoring './_includes/avd/add-avd-monitoring-workspace.bicep' = {
+module workspaceAddMonitoring './.includes/avd/add-avd-monitoring-workspace.bicep' = {
   name: 'workspaceAddMonitoring'
   scope: resourceGroupItem
 
@@ -96,7 +96,7 @@ module workspaceAddMonitoring './_includes/avd/add-avd-monitoring-workspace.bice
 }
 
 // Configure the diagnostic settings for the AVD insights workbook on the created hostpool (Desktop).
-module hostpoolDesktopAddMonitoring './_includes/avd/add-avd-monitoring-hostpool.bicep' = if (createDesktopHostpool) {
+module hostpoolDesktopAddMonitoring './.includes/avd/add-avd-monitoring-hostpool.bicep' = if (createDesktopHostpool) {
   name: 'hostpoolDesktopAddMonitoring'
   scope: resourceGroupItem
 
@@ -110,7 +110,7 @@ module hostpoolDesktopAddMonitoring './_includes/avd/add-avd-monitoring-hostpool
 }
 
 // Configure the diagnostic settings for the AVD insights workbook on the created hostpool (RemoteApp).
-module hostpoolRemoteAppAddMonitoring './_includes/avd/add-avd-monitoring-hostpool.bicep' = if (createRemoteAppHostpool) {
+module hostpoolRemoteAppAddMonitoring './.includes/avd/add-avd-monitoring-hostpool.bicep' = if (createRemoteAppHostpool) {
   name: 'hostpoolRemoteAppAddMonitoring'
   scope: resourceGroupItem
 

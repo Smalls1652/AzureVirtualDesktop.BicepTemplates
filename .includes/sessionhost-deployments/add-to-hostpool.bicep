@@ -53,7 +53,7 @@ resource hostPoolRegInfo 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   properties: {
     azPowerShellVersion: '12.0'
 
-    scriptContent: loadTextContent('./_scripts/Get-HostPoolRegInfo.ps1')
+    scriptContent: loadTextContent('./.scripts/Get-HostPoolRegInfo.ps1')
     arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -ResourceGroupName \\"${resourceGroup().name}\\" -HostPoolName \\"${hostPool.name}\\"'
 
     timeout: 'PT30M'
@@ -70,7 +70,7 @@ resource addVmToHostpool 'Microsoft.Compute/virtualMachines/runCommands@2024-03-
   properties: {
 
     source: {
-      script: loadTextContent('./_scripts/Invoke-AvdAgentInstall.ps1')
+      script: loadTextContent('./.scripts/Invoke-AvdAgentInstall.ps1')
     }
 
     timeoutInSeconds: 1800

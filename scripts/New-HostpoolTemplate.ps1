@@ -2,12 +2,15 @@
 param(
     [Parameter(Position = 0, Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [string]$HostPoolName
+    [string]$HostPoolName,
+		[Parameter(Position = 1)]
+		[ValidateNotNullOrWhiteSpace()]
+		[string]$RootPath
 )
 
-$templatePath = Join-Path -Path $PSScriptRoot -ChildPath "_template/"
+$templatePath = Join-Path -Path $RootPath -ChildPath ".template-files/"
 $filesToCopy = Get-ChildItem -Path $templatePath | Where-Object { $PSItem.Extension -eq ".bicepparam" }
-$hostpoolsDirPath = Join-Path -Path $PSScriptRoot -ChildPath "hostpools/"
+$hostpoolsDirPath = Join-Path -Path $RootPath -ChildPath "Hostpools/"
 $outPath = Join-Path -Path $hostpoolsDirPath -ChildPath "$($HostPoolName)/"
 
 $bicepParamUsingRegex = [regex]::new("using '(?'usingPath'.+?)'")
@@ -33,7 +36,7 @@ $outDirectory = New-Item -Path $outPath -ItemType "Directory"
 foreach ($fileItem in $filesToCopy) {
     $outFilePath = Join-Path -Path $outPath -ChildPath $fileItem.Name
 
-    $bicepFile = Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "$($fileItem.BaseName).bicep")
+    $bicepFile = Get-Item -Path (Join-Path -Path $RootPath -ChildPath "$($fileItem.BaseName).bicep")
 
     $templateFileContent = Get-Content -Path $fileItem.FullName -Raw
 

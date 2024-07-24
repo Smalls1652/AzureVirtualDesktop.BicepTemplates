@@ -105,7 +105,7 @@ resource resourceGroupItem 'Microsoft.Resources/resourceGroups@2024-03-01' exist
 }
 
 // Deploy the session host.
-module deployHost './_includes/sessionhost-deployments/create-sessionhost.bicep' = {
+module deployHost './.includes/sessionhost-deployments/create-sessionhost.bicep' = {
   name: 'deploySessionHost_${randomString}'
   scope: resourceGroupItem
 

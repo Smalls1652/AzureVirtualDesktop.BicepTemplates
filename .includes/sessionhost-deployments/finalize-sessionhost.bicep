@@ -50,7 +50,7 @@ resource finalizeSessionHost 'Microsoft.Resources/deploymentScripts@2023-08-01' 
   properties: {
     azPowerShellVersion: '12.0'
 
-    scriptContent: loadTextContent('./_scripts/Invoke-SessionHostFinalize.ps1')
+    scriptContent: loadTextContent('./.scripts/Invoke-SessionHostFinalize.ps1')
     arguments: '-TenantId \\"${deploymentScriptPrincipal.properties.tenantId}\\" -SubscriptionId \\"${subscription().subscriptionId}\\" -VmResourceId \\"${vmItem.id}\\" -HostPoolName \\"${hostPool.name}\\" -DomainName \\"${vmDomainName}\\"'
 
     timeout: 'PT2H'
