@@ -131,10 +131,6 @@ resource windowsVm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
   name: vmName
   location: vmLocation
 
-  identity: {
-    type: 'SystemAssigned'
-  }
-
   properties: {
     hardwareProfile: {
       vmSize: vmSize
