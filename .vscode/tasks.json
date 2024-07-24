@@ -31,6 +31,41 @@
         "showReuseMessage": true,
         "clear": true
       }
+    },
+    {
+      "label": "Create FSLogix Intune config profile",
+      "detail": "Create a new config profile for FSLogix settings in Intune.",
+      "icon": {
+        "id": "empty-window",
+        "color": "terminal.ansiCyan"
+      },
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/scripts/New-FSLogixIntuneProfile.ps1",
+        "-ProfileName",
+        "${input:fslogixIntuneProfileName}",
+        "-ProfileDescription",
+        "${input:fslogixIntuneProfileDescription}",
+        "-FSLogixFileSharePath",
+        "${input:fslogixIntuneProfileSmbPath}",
+        "-ConnectToMSGraph",
+        "-WhatIf:$${input:fslogixIntuneProfileWhatIf}",
+      ],
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      }
     }
   ],
   "inputs": [
@@ -38,6 +73,37 @@
       "id": "hostpoolName",
       "description": "Enter the name of the hostpool.",
       "type": "promptString"
+    },
+    {
+      "id": "fslogixIntuneProfileName",
+      "description": "Enter a name for the new FSLogix Intune config profile.",
+      "type": "promptString"
+    },
+    {
+      "id": "fslogixIntuneProfileDescription",
+      "description": "Enter a description for the new FSLogix Intune config profile.",
+      "type": "promptString"
+    },
+    {
+      "id": "fslogixIntuneProfileSmbPath",
+      "description": "Enter the SMB path for the FSLogix profile container.",
+      "type": "promptString"
+    },
+    {
+      "id": "fslogixIntuneProfileWhatIf",
+      "description": "Run the script in WhatIf mode?",
+      "type": "pickString",
+      "default": "false",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "true"
+        },
+        {
+          "label": "No",
+          "value": "false"
+        }
+      ]
     }
   ]
 }

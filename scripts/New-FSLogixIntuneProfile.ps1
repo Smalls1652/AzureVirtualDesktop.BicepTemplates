@@ -50,6 +50,9 @@
 .PARAMETER FSLogixFileSharePath
 	The path to the FSLogix SMB file share.
 
+.PARAMETER ConnectToMSGraph
+	Connect to MS Graph interactively.
+
 .EXAMPLE
 	New-FSLogixIntuneProfile.ps1 -ProfileName "FSLogix Settings" -ProfileDescription "FSLogix settings for Azure Virtual Desktop" -FSLogixFileSharePath "\\fslogix\profiles"
 
@@ -64,7 +67,9 @@ param(
 	[string]$ProfileDescription,
 	[Parameter(Position = 2, Mandatory)]
 	[ValidateNotNullOrWhiteSpace()]
-	[string]$FSLogixFileSharePath
+	[string]$FSLogixFileSharePath,
+	[Parameter(Position = 3)]
+	[switch]$ConnectToMSGraph
 )
 
 # Template content for the FSLogix config profile.
@@ -362,10 +367,24 @@ $fslogixSettingsTemplateContent = @"
 }
 "@
 
+# Get the value of the WhatIf parameter.
+# This is to check if connecting to MS Graph is required.
+$whatifValue = $false
+foreach ($paramItem in $PSCmdlet.MyInvocation.BoundParameters.GetEnumerator()) {
+	if ($paramItem.Key -eq "WhatIf") {
+		$whatifValue = $paramItem.Value
+		break
+	}
+}
+
+if ($ConnectToMSGraph -and !$whatifValue) {
+	Connect-MgGraph -ErrorAction "Stop" -NoWelcome -ContextScope "Process"
+}
+
 $currentGraphContext = Get-MgContext
 
 # If no current MS Graph context is found, throw an error.
-if ($null -eq $currentGraphContext) {
+if (!$ConnectToMSGraph -and !$whatifValue -and $null -eq $currentGraphContext) {
 	$PSCmdlet.ThrowTerminatingError(
 		[System.Management.Automation.ErrorRecord]::new(
 			[System.Exception]::new("No Graph context found. Please run 'Connect-MgGraph' first."),
@@ -377,7 +396,7 @@ if ($null -eq $currentGraphContext) {
 }
 
 # Check if the current MS Graph context has the required scopes.
-if ("DeviceManagementConfiguration.ReadWrite.All" -notin $currentGraphContext.Scopes) {
+if (!$whatifValue -and "DeviceManagementConfiguration.ReadWrite.All" -notin $currentGraphContext.Scopes) {
 	$PSCmdlet.ThrowTerminatingError(
 		[System.Management.Automation.ErrorRecord]::new(
 			[System.Exception]::new("Insufficient Scopes. Please run 'Connect-MgGraph -Scopes DeviceManagementConfiguration.ReadWrite.All' first."),
