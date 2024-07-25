@@ -103,6 +103,10 @@ resource addEntraIDLoginExtension 'Microsoft.Compute/virtualMachines/extensions@
 
   location: location
 
+  dependsOn: [
+    addVmToHostpool
+  ]
+
   properties: {
     publisher: 'Microsoft.Azure.ActiveDirectory'
     type: 'AADLoginForWindows'
